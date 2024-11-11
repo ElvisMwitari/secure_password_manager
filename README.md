@@ -98,6 +98,15 @@ Run the test suite using the command:
 
 ```bash
 npm test
+# minor tests
+# For testPasswordManager.js
+node testPasswordManager.js
+
+# For keychainTests.js
+node keychainTests.js
+
+# For testAsync.js
+node testAsync.js
 ```
 
 This runs `keychainTests.js`, which includes tests for:
