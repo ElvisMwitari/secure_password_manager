@@ -26,8 +26,8 @@ This project is a secure password manager developed as part of the CS255 Compute
 1. **Clone the Repository**:
 
     ```bash
-    git clone https://github.com/your-username/cs255_proj1_password_manager.git
-    cd cs255_proj1_password_manager
+    git clone https://github.com/ElvisMwitari/secure_password_manager.git
+    cd secure_password_manager
     ```
 
 2. **Install Dependencies**:
