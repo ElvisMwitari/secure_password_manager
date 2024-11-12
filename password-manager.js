@@ -158,40 +158,57 @@ class Keychain {
     }
   }
 
-  // Method to dump the keychain data for backup
-  async dump() {
-    const kvsString = JSON.stringify(this.data);
-    const kvsBuffer = stringToBuffer(kvsString);
+// Method to dump the keychain data for backup
+async dump() {
+  const kvsObject = { kvs: this.data }; // Wrap data in a `kvs` object
+  const kvsString = JSON.stringify(kvsObject);
+  const kvsBuffer = stringToBuffer(kvsString);
 
-    const checksumBuffer = await subtle.digest("SHA-256", kvsBuffer);
-    const checksum = encodeBuffer(checksumBuffer);
+  const checksumBuffer = await subtle.digest("SHA-256", kvsBuffer);
+  const checksum = encodeBuffer(checksumBuffer);
 
-    console.log("Data dumped successfully");
-    return [kvsString, checksum, this.secrets.salt];
-  }
+  console.log("Data dumped successfully");
+  return [kvsString, checksum, this.secrets.salt];
+}
 
-  // Static method to load keychain data and verify integrity
-  static async load(password, repr, trustedDataCheck = null, salt) {
-    const kvsBuffer = stringToBuffer(repr);
+ // Static method to load keychain data and verify integrity
+ static async load(password, repr, trustedDataCheck = null, salt) {
+  const kvsBuffer = stringToBuffer(repr);
 
-    // Verify checksum if provided
-    if (trustedDataCheck) {
-      const computedChecksumBuffer = await subtle.digest("SHA-256", kvsBuffer);
-      const computedChecksum = encodeBuffer(computedChecksumBuffer);
+  // Verify checksum if provided
+  if (trustedDataCheck) {
+    const computedChecksumBuffer = await subtle.digest("SHA-256", kvsBuffer);
+    const computedChecksum = encodeBuffer(computedChecksumBuffer);
 
-      if (computedChecksum !== trustedDataCheck) {
-        throw new Error("Data integrity check failed: checksum mismatch.");
-      }
+    if (computedChecksum !== trustedDataCheck) {
+      throw new Error("Data integrity check failed: checksum mismatch.");
     }
-
-    const data = JSON.parse(repr);
-
-    const keychain = await Keychain.init(password, salt);
-    keychain.data = data;
-
-    console.log("Data loaded successfully");
-    return keychain;
   }
+
+  // Verify checksum if provided
+  if (trustedDataCheck) {
+    const computedChecksumBuffer = await subtle.digest("SHA-256", kvsBuffer);
+    const computedChecksum = encodeBuffer(computedChecksumBuffer);
+
+    if (computedChecksum !== trustedDataCheck) {
+      throw new Error("Data integrity check failed: checksum mismatch.");
+    }
+  }
+
+  const parsedData = JSON.parse(repr);
+
+  // Ensure the parsed data includes the `kvs` key
+  if (!parsedData.kvs) {
+    throw new Error("Invalid data format: 'kvs' key is missing");
+  }
+
+  const keychain = await Keychain.init(password, salt);
+  keychain.data = parsedData.kvs;
+
+  console.log("Data loaded successfully");
+  return keychain;
+}
+
 }
 
 module.exports = { Keychain };
