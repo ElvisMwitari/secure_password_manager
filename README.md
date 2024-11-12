@@ -146,20 +146,20 @@ This password manager employs several security mechanisms:
 ---
 ### Short Answer Section
 
-**Preventing Information Leakage on Password Lengths**
+**Preventing Information Leakage on Password Lengths.**
 To prevent the adversary from learning password lengths, we used AES-GCM encryption. The encryption output includes a fixed-size tag and an IV, making it difficult for an adversary to deduce the length of the underlying plaintext.
 
-**Preventing Swap Attacks**
+**Preventing Swap Attacks.**
 We prevented swap attacks by including the domain name in the data that is encrypted and verifying it after decryption. If entries were swapped, the decrypted domain would not match the expected domain, causing the retrieval to fail. This design ensures that each entry is uniquely bound to its respective domain, making it infeasible for an attacker to rearrange entries without detection.
 
-**Necessity of a Trusted Location for Checksum Storage**
+**Necessity of a Trusted Location for Checksum Storage.**
 Yes, a trusted location is necessary to securely store the SHA-256 checksum for rollback attack prevention. Without a trusted location, an adversary could replace the stored data and the checksum together, bypassing the rollback protection by reverting both to a previous state. The trusted location ensures the checksum cannot be tampered with, preserving data integrity.
 
-**Using a Randomized MAC Instead of HMAC**
+**Using a Randomized MAC Instead of HMAC.**
 If we used a randomized MAC instead of HMAC, we would no longer be able to reliably use the MAC to look up domain names, as the MAC value would differ each time for the same input. We would need to store additional mappings of each domain to its MAC or perform a sequential scan to find the correct domain, resulting in a performance penalty due to additional storage and lookup costs.
 
-**Reducing Information Leakage on Record Count**
+**Reducing Information Leakage on Record Count.**
 To reduce leakage about the number of records, we could group records into "buckets" and only reveal the number of non-empty buckets, rather than the exact number of records. For instance, if there are 4 to 7 records, we might represent them within one bucket, leaking only that the number is within this range. This approach ensures that an adversary learns only log2(k) about the actual record count.
 
-**Adding Multi-User Support without Compromising Security**
+**Adding Multi-User Support without Compromising Security.**
 Multi-user support can be added by creating separate keys for shared entries. For example, Alice and Bob could each have individual keys for personal entries, while a shared key (derived from a combined secret or managed through a secure key-sharing protocol) could be used for entries like "nytimes" that both users can access. This ensures that shared entries are accessible without compromising the security of other, individually owned entries.
